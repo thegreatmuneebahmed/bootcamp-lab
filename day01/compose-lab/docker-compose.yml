@@ -1,0 +1,7 @@
+services:
+  web:
+    build: .
+    container_name: compose-web
+    ports:
+      - "8001:8000"
+    restart: unless-stopped
