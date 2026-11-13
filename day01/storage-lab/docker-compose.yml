@@ -1,0 +1,17 @@
+services:
+  web:
+    build: .
+    container_name: storage-web
+    ports:
+      - "8002:8000"
+    volumes:
+      - appdata:/data
+    networks:
+      - appnetwork
+
+volumes:
+  appdata:
+
+networks:
+  appnetwork:
+    driver: bridge
