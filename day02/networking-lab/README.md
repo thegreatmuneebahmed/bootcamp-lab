@@ -181,3 +181,32 @@ This experiment demonstrates that direct IP-based TCP communication was possible
 ICMP failure must not be interpreted as proof that TCP is unavailable. Diagnose DNS, IP reachability, TCP ports, and application-layer responses independently.
 
 These findings describe this tested environment, not a universal guarantee about every Docker Engine or Docker Desktop networking configuration.
+
+## Routing and TCP socket investigation
+
+### Source container routing
+
+Command:
+`docker exec web1 ip route get 172.17.0.2`
+
+Verified output:
+`172.17.0.2 via 172.18.0.1 dev eth0 src 172.18.0.2`
+
+The source container selects 172.18.0.1 as its next-hop gateway when communicating with devops-app.
+
+### Destination application listener
+
+Inspected `/proc/net/tcp` inside devops-app.
+
+- `00000000:1388` represents 0.0.0.0:5000.
+- TCP state `0A` represents LISTEN.
+- The application listens on port 5000 on all IPv4 interfaces.
+
+### Findings
+
+- Cross-network HTTP communication returned HTTP 200.
+- Source routing selected its default gateway.
+- Destination application was listening on the expected port.
+- The exact internal Docker Desktop forwarding path and firewall rule were not established.
+
+This experiment demonstrates observed cross-network TCP connectivity in the tested Docker Desktop environment. It does not establish universal Docker bridge-network behavior.
